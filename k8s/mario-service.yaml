@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mario-deployment
+
+spec:
+  selector:
+    matchLabels:
+      app: mario
+    
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: mario
+
+    spec:
+      containers:
+      - name: pacman
+        image: pengbai/docker-supermario
+        ports:
+        - containerPort: 8081
+        resources:
+          requests:
+            cpu: 150m
+            memory: 32Mi
+          limits:
+            cpu: 500m
+            memory: 500Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mario-service
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+      
+  selector:
+    app: mario
+
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+ name: mario-deployment-autoscaler
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mario-deployment
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu 
+      target:
+        type: Utilization
+        averageUtilization: 50

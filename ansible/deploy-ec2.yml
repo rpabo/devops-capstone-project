@@ -1,0 +1,35 @@
+- name: Provision EC2 instance
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - credential-file.yml
+    
+  tasks:
+    - name: Create AWS EC2 Master Node
+      ec2:
+        
+        instance_type: t2.micro
+        image: ami-03d5c68bab01f3496
+        region: us-west-2
+        wait: yes
+        count: 1
+        aws_access_key: "{{aws_accesskey}}"
+        aws_secret_key: "{{aws_secretkey}}"
+        instance_tags: {"Name" : "master", "Cluster": "k8s Cluster"}
+        key_name: k8s
+        group: k8s-capstone
+        instance_profile_name : k8s-capstone-role
+
+    - name: Create AWS EC2 Worker Nodes
+      ec2:
+        instance_type: t2.micro
+        image: ami-03d5c68bab01f3496
+        region: us-west-2
+        wait: yes
+        count: 2
+        aws_access_key: "{{aws_accesskey}}"
+        aws_secret_key: "{{aws_secretkey}}"
+        instance_tags: {"Name" : "worker", "Cluster": "k8s Cluster"}
+        key_name: k8s
+        group: k8s-capstone
+        instance_profile_name : k8s-capstone-role
