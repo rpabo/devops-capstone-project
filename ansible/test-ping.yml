@@ -1,0 +1,10 @@
+---
+- name: Ping with PEM
+  hosts: tag_Name_master
+  vars:
+    ansible_ssh_private_key_file: "~/.ssh/k8s.pem"
+    ansible_user: ubuntu
+
+  tasks:
+    - name: ping test
+      ping:
